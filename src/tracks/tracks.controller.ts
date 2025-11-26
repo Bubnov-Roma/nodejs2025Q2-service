@@ -3,9 +3,11 @@ import {
   Body,
   Controller,
   Delete,
+  forwardRef,
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Post,
   Put,
@@ -15,11 +17,16 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto, UpdateTrackDto } from './dto/create-track.dto';
 import { isUUID } from 'class-validator';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Controller('tracks')
 @UseGuards(JwtAuthGuard)
 export class TracksController {
-  constructor(private readonly tracksService: TracksService) {}
+  constructor(
+    private readonly tracksService: TracksService,
+    @Inject(forwardRef(() => FavoritesService))
+    private readonly favoritesService: FavoritesService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -55,5 +62,6 @@ export class TracksController {
       throw new BadRequestException('Invalid track ID');
     }
     this.tracksService.remove(id);
+    this.favoritesService.removeTrackFromFavorites(id);
   }
 }

@@ -3,9 +3,11 @@ import {
   Body,
   Controller,
   Delete,
+  forwardRef,
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Post,
   Put,
@@ -15,11 +17,19 @@ import { AlbumsService } from './albums.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateAlbumDto, UpdateAlbumDto } from './dto/create-album.dto';
 import { isUUID } from 'class-validator';
+import { TracksService } from 'src/tracks/tracks.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Controller('album')
 @UseGuards(JwtAuthGuard)
 export class AlbumsController {
-  constructor(private readonly albumsService: AlbumsService) {}
+  constructor(
+    private readonly albumsService: AlbumsService,
+    @Inject(forwardRef(() => TracksService))
+    private readonly tracksService: TracksService,
+    @Inject(forwardRef(() => FavoritesService))
+    private readonly favoritesService: FavoritesService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -55,5 +65,7 @@ export class AlbumsController {
       throw new BadRequestException('Invalid album ID');
     }
     this.albumsService.remove(id);
+    this.tracksService.nullifyAlbumId(id);
+    this.favoritesService.removeAlbumFromFavorites(id);
   }
 }
