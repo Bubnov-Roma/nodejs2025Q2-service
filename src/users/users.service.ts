@@ -1,4 +1,8 @@
-import { Injectable, NotImplementedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { CreateUserDto, UpdatePasswordDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -33,7 +37,7 @@ export class UsersService {
   findOne(id: string): User {
     const user = this.users.find((u) => u.id === id);
     if (!user) {
-      throw new NotImplementedException('User not found');
+      throw new NotFoundException('User not found');
     }
     return user;
   }
@@ -54,7 +58,7 @@ export class UsersService {
     );
 
     if (!isOldPasswordValid) {
-      throw new NotImplementedException('Old password is incorrect');
+      throw new ForbiddenException('Old password is incorrect');
     }
 
     const hashedNewPassword = await bcrypt.hash(
@@ -62,8 +66,8 @@ export class UsersService {
       Number(process.env.CRYPT_SALT) || 10,
     );
     user.password = hashedNewPassword;
-    user.updatedAt = Date.now();
     user.version += 1;
+    user.updatedAt = Date.now();
 
     return user;
   }
@@ -71,7 +75,7 @@ export class UsersService {
   remove(id: string): void {
     const index = this.users.findIndex((u) => u.id === id);
     if (index === -1) {
-      throw new NotImplementedException('User not found');
+      throw new NotFoundException('User not found');
     }
     this.users.splice(index, 1);
   }
