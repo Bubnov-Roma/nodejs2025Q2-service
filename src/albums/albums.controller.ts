@@ -11,17 +11,14 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateAlbumDto, UpdateAlbumDto } from './dto/create-album.dto';
-import { isUUID } from 'class-validator';
+import { validate as isUUID } from 'uuid';
 import { TracksService } from 'src/tracks/tracks.service';
 import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Controller('album')
-@UseGuards(JwtAuthGuard)
 export class AlbumsController {
   constructor(
     private readonly albumsService: AlbumsService,
