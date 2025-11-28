@@ -11,14 +11,19 @@ import {
   Param,
   Post,
   Put,
+  UseGuards /* TODO: needs to be commented out for check tests without authorization */,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto, UpdateAlbumDto } from './dto/create-album.dto';
 import { validate as isUUID } from 'uuid';
 import { TracksService } from 'src/tracks/tracks.service';
 import { FavoritesService } from 'src/favorites/favorites.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'; /* TODO: needs to be commented out for check tests without authorization */
 
 @Controller('album')
+@UseGuards(
+  JwtAuthGuard,
+) /* TODO: needs to be commented out for check tests without authorization */
 export class AlbumsController {
   constructor(
     private readonly albumsService: AlbumsService,
