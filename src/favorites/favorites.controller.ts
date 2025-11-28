@@ -7,11 +7,16 @@ import {
   HttpStatus,
   Param,
   Post,
+  UseGuards /* TODO: needs to be commented out for check tests without authorization */,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { validate as isUUID } from 'uuid';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'; /* TODO: needs to be commented out for check tests without authorization */
 
 @Controller('favs')
+@UseGuards(
+  JwtAuthGuard,
+) /* TODO: needs to be commented out for check tests without authorization */
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
