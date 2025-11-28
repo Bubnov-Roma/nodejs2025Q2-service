@@ -62,7 +62,7 @@ export class FavoritesService {
       throw new UnprocessableEntityException('Artist does not exist');
     }
 
-    if (this.favorites.artists.includes(id)) {
+    if (!this.favorites.artists.includes(id)) {
       this.favorites.artists.push(id);
     }
   }
