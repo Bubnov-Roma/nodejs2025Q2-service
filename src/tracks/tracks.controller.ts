@@ -11,16 +11,13 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto, UpdateTrackDto } from './dto/create-track.dto';
-import { isUUID } from 'class-validator';
+import { validate as isUUID } from 'uuid';
 import { FavoritesService } from 'src/favorites/favorites.service';
 
-@Controller('tracks')
-@UseGuards(JwtAuthGuard)
+@Controller('track')
 export class TracksController {
   constructor(
     private readonly tracksService: TracksService,
