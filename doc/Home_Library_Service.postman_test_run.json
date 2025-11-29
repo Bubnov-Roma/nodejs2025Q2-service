@@ -1,0 +1,621 @@
+{
+	"id": "3af5a73e-1f35-4e1c-84ff-7a7922853051",
+	"name": "Home Library Service",
+	"timestamp": "2025-11-28T08:22:57.518Z",
+	"collection_id": "29806053-5f0af016-5025-4660-8927-0023e4d059c1",
+	"folder_id": 0,
+	"environment_id": "29806053-2d24e1c6-7877-4038-8e53-4aee9e8dac8c",
+	"totalPass": 12,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-11-28T08:22:56.213Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "6ca6c702-cef5-4a3e-8bc6-5e2e7c634cb3",
+			"name": "1.1 Create User",
+			"url": "http://localhost:4000/user",
+			"time": 92,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201": true,
+				"User created successfully": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"User created successfully": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				92
+			],
+			"allTests": [
+				{
+					"Status code is 201": true,
+					"User created successfully": true
+				}
+			]
+		},
+		{
+			"id": "63ed775b-1c1b-4a10-a8ff-d2afb693caa7",
+			"name": "2.1 Create Artist",
+			"url": "http://localhost:4000/artist",
+			"time": 4,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201": true,
+				"Artist created": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Artist created": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Status code is 201": true,
+					"Artist created": true
+				}
+			]
+		},
+		{
+			"id": "52632659-cb0b-40a3-8023-762fe9821028",
+			"name": "3.2 Create Album (with artist)",
+			"url": "http://localhost:4000/album",
+			"time": 2,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "d972f3fc-8dee-4edf-b4e4-d0d6fdc9cd57",
+			"name": "4.1 Create Track",
+			"url": "http://localhost:4000/track",
+			"time": 2,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201": true,
+				"Track created": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Track created": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				2
+			],
+			"allTests": [
+				{
+					"Status code is 201": true,
+					"Track created": true
+				}
+			]
+		},
+		{
+			"id": "c4bb8931-78c4-4b8b-bbf4-95db6f4dc87a",
+			"name": "5.2 Add Artist to Favorites",
+			"url": "http://localhost:4000/favs/artist/d62625d2-31ab-4747-88cc-d5e6382b363c",
+			"time": 2,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				2
+			],
+			"allTests": [
+				{
+					"Status code is 201": true
+				}
+			]
+		},
+		{
+			"id": "139fc0ed-a14b-4397-95a7-543f32fa7148",
+			"name": "5.3 Add Album to Favorites",
+			"url": "http://localhost:4000/favs/album/5b606935-94f3-4ab2-b604-4734802a4c1f",
+			"time": 2,
+			"responseCode": {
+				"code": 422,
+				"name": "Unprocessable Entity"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "0f628256-1165-4920-a3f2-750a477810a6",
+			"name": "5.4 Add Track to Favorites",
+			"url": "http://localhost:4000/favs/track/01423f1d-507d-4c37-921a-34ec5ffefa3b",
+			"time": 2,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "ca7fb8a3-15d7-4858-8b28-fdb04889f7aa",
+			"name": "1.2 Get All Users",
+			"url": "http://localhost:4000/user",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response is array": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response is array": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response is array": true
+				}
+			]
+		},
+		{
+			"id": "f5b3aee5-c832-475e-872b-771703f9bd7d",
+			"name": "2.2 Get All Artists",
+			"url": "http://localhost:4000/artist",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				3
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "d00d9262-74af-4367-9f54-3d020f66c576",
+			"name": "3.3 Get All Albums",
+			"url": "http://localhost:4000/album",
+			"time": 2,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "58b16dd0-0ed3-4678-8fcf-d41455270deb",
+			"name": "4.2 Get All Tracks",
+			"url": "http://localhost:4000/track",
+			"time": 2,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "b39d4f49-3a02-419c-b3b5-92df90130542",
+			"name": "5.1 Get All Favorites",
+			"url": "http://localhost:4000/favs",
+			"time": 2,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "e0b109cb-7aff-45e7-8fb8-3b12c9403ca2",
+			"name": "1.4 Update Password",
+			"url": "http://localhost:4000/user/17bc4153-5042-46a8-accb-1d74f2381ed8",
+			"time": 189,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Version incremented": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Version incremented": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				189
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Version incremented": true
+				}
+			]
+		},
+		{
+			"id": "3756e923-c2eb-41d1-8027-a939c614ac20",
+			"name": "2.4 Update Artist",
+			"url": "http://localhost:4000/artist/d62625d2-31ab-4747-88cc-d5e6382b363c",
+			"time": 2,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "dd36599c-474e-4c99-a723-d03eabc0d06d",
+			"name": "3.4 Update Album",
+			"url": "http://localhost:4000/album/5b606935-94f3-4ab2-b604-4734802a4c1f",
+			"time": 2,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "5decc889-d3a7-4821-aa09-c23e24e6aff0",
+			"name": "4.4 Update Track",
+			"url": "http://localhost:4000/track/01423f1d-507d-4c37-921a-34ec5ffefa3b",
+			"time": 2,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "008d9a04-11a4-493d-bc44-c4f149486bb5",
+			"name": "5.8 Remove Track from Favorites",
+			"url": "http://localhost:4000/favs/track/01423f1d-507d-4c37-921a-34ec5ffefa3b",
+			"time": 2,
+			"responseCode": {
+				"code": 204,
+				"name": "No Content"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "350b89fa-d541-4794-b655-e15418347609",
+			"name": "5.7 Remove Album from Favorites",
+			"url": "http://localhost:4000/favs/album/5b606935-94f3-4ab2-b604-4734802a4c1f",
+			"time": 2,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "a1243af7-87cc-41ca-8668-eb119fad933c",
+			"name": "5.6 Remove Artist from Favorites",
+			"url": "http://localhost:4000/favs/artist/d62625d2-31ab-4747-88cc-d5e6382b363c",
+			"time": 2,
+			"responseCode": {
+				"code": 204,
+				"name": "No Content"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "7a215ec9-6968-479b-9272-1c613c21cdcf",
+			"name": "4.5 Delete Track",
+			"url": "http://localhost:4000/track/01423f1d-507d-4c37-921a-34ec5ffefa3b",
+			"time": 2,
+			"responseCode": {
+				"code": 204,
+				"name": "No Content"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "2180bac1-2eda-4dac-8750-b86ca12c0f50",
+			"name": "3.5 Delete Album",
+			"url": "http://localhost:4000/album/5b606935-94f3-4ab2-b604-4734802a4c1f",
+			"time": 2,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "eb9ac3ee-8f1e-45d4-b1ad-a9f61e505f94",
+			"name": "2.5 Delete Artist",
+			"url": "http://localhost:4000/artist/d62625d2-31ab-4747-88cc-d5e6382b363c",
+			"time": 2,
+			"responseCode": {
+				"code": 204,
+				"name": "No Content"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				2
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "a7a7953d-82ae-456c-b269-ac7f4944442e",
+			"name": "1.5 Delete User",
+			"url": "http://localhost:4000/user/17bc4153-5042-46a8-accb-1d74f2381ed8",
+			"time": 1,
+			"responseCode": {
+				"code": 204,
+				"name": "No Content"
+			},
+			"tests": {
+				"Status code is 204": true
+			},
+			"testPassFailCounts": {
+				"Status code is 204": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1
+			],
+			"allTests": [
+				{
+					"Status code is 204": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 326,
+	"collection": {
+		"requests": [
+			{
+				"id": "6ca6c702-cef5-4a3e-8bc6-5e2e7c634cb3",
+				"method": "POST"
+			},
+			{
+				"id": "63ed775b-1c1b-4a10-a8ff-d2afb693caa7",
+				"method": "POST"
+			},
+			{
+				"id": "52632659-cb0b-40a3-8023-762fe9821028",
+				"method": "POST"
+			},
+			{
+				"id": "d972f3fc-8dee-4edf-b4e4-d0d6fdc9cd57",
+				"method": "POST"
+			},
+			{
+				"id": "c4bb8931-78c4-4b8b-bbf4-95db6f4dc87a",
+				"method": "POST"
+			},
+			{
+				"id": "139fc0ed-a14b-4397-95a7-543f32fa7148",
+				"method": "POST"
+			},
+			{
+				"id": "0f628256-1165-4920-a3f2-750a477810a6",
+				"method": "POST"
+			},
+			{
+				"id": "ca7fb8a3-15d7-4858-8b28-fdb04889f7aa",
+				"method": "GET"
+			},
+			{
+				"id": "f5b3aee5-c832-475e-872b-771703f9bd7d",
+				"method": "GET"
+			},
+			{
+				"id": "d00d9262-74af-4367-9f54-3d020f66c576",
+				"method": "GET"
+			},
+			{
+				"id": "58b16dd0-0ed3-4678-8fcf-d41455270deb",
+				"method": "GET"
+			},
+			{
+				"id": "b39d4f49-3a02-419c-b3b5-92df90130542",
+				"method": "GET"
+			},
+			{
+				"id": "e0b109cb-7aff-45e7-8fb8-3b12c9403ca2",
+				"method": "PUT"
+			},
+			{
+				"id": "3756e923-c2eb-41d1-8027-a939c614ac20",
+				"method": "PUT"
+			},
+			{
+				"id": "dd36599c-474e-4c99-a723-d03eabc0d06d",
+				"method": "PUT"
+			},
+			{
+				"id": "5decc889-d3a7-4821-aa09-c23e24e6aff0",
+				"method": "PUT"
+			},
+			{
+				"id": "008d9a04-11a4-493d-bc44-c4f149486bb5",
+				"method": "DELETE"
+			},
+			{
+				"id": "350b89fa-d541-4794-b655-e15418347609",
+				"method": "DELETE"
+			},
+			{
+				"id": "a1243af7-87cc-41ca-8668-eb119fad933c",
+				"method": "DELETE"
+			},
+			{
+				"id": "7a215ec9-6968-479b-9272-1c613c21cdcf",
+				"method": "DELETE"
+			},
+			{
+				"id": "2180bac1-2eda-4dac-8750-b86ca12c0f50",
+				"method": "DELETE"
+			},
+			{
+				"id": "eb9ac3ee-8f1e-45d4-b1ad-a9f61e505f94",
+				"method": "DELETE"
+			},
+			{
+				"id": "a7a7953d-82ae-456c-b269-ac7f4944442e",
+				"method": "DELETE"
+			}
+		]
+	}
+}
