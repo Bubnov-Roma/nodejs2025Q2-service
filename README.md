@@ -16,6 +16,8 @@ A RESTful API service for managing a home music library with support for users, 
 
 ## [Setup instructions](./doc/SETUP_INSTRUCTIONS.md)
 
+Current development branch of this sprint "origin/feat/one"
+
 ## [Documentation](./doc/api.yaml)
 
 ## [Structure](./doc/PROJECT_STRUCTURE.md)
@@ -23,6 +25,44 @@ A RESTful API service for managing a home music library with support for users, 
 ## [Endpoints](./doc/API_Endpoints.md)
 
 ## [Testing](./doc/TESTING.md)
+
+## Testing
+
+### ⚠️ To check tests without authorization, please comment the TODO lines in the files:
+
+[albums](./src/albums/albums.controller.ts)
+[artists](./src/artists/artists.controller.ts)
+[favorites](./src/favorites/favorites.controller.ts)
+[tracks](./src/tracks/tracks.controller.ts)
+[users](./src/users/users.controller.ts)
+
+### and re-run server `npm run start` or `npm run start:dev`
+
+I very much apologize for the inconvenience caused when checking this assignment 🙏🙏🙏
+
+### Run all tests (without authorization)
+
+```bash
+npm run test
+```
+
+### Run tests with authorization
+
+```bash
+npm run test:auth
+```
+
+### Run specific test suite
+
+```bash
+npm run test -- <path-to-suite>
+```
+
+### Run refresh token tests
+
+```bash
+npm run test:refresh
+```
 
 ## Key Implementation Details
 
