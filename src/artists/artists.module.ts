@@ -5,10 +5,10 @@ import { TracksModule } from 'src/tracks/tracks.module';
 import { AlbumsModule } from 'src/albums/album.module';
 import { FavoritesModule } from 'src/favorites/favorites.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Track } from 'src/tracks/entities/track.entity';
-import { Artist } from './entities/artist.entity';
-import { Album } from 'src/albums/entities/album.entity';
-import { Favorite } from 'src/favorites/entities/favorites.entity';
+import { Track } from 'src/database/entities/track.entity';
+import { Artist } from '../database/entities/artist.entity';
+import { Album } from 'src/database/entities/album.entity';
+import { Favorite } from 'src/database/entities/favorite.entity';
 
 @Module({
   imports: [

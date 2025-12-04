@@ -3,8 +3,8 @@ import { TracksController } from './tracks.controller';
 import { TracksService } from './tracks.service';
 import { FavoritesModule } from 'src/favorites/favorites.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Track } from './entities/track.entity';
-import { Favorite } from 'src/favorites/entities/favorites.entity';
+import { Track } from '../database/entities/track.entity';
+import { Favorite } from 'src/database/entities/favorite.entity';
 
 @Module({
   imports: [
