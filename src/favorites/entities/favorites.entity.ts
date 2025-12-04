@@ -1,15 +1,11 @@
-import { Album } from 'src/albums/entities/album.entity';
-import { Artist } from 'src/artists/entities/artist.entity';
-import { Track } from 'src/tracks/entities/track.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-export class Favorites {
-  artists: string[];
-  albums: string[];
-  tracks: string[];
-}
-
-export class FavoritesResponse {
-  artists: Artist[];
-  albums: Album[];
-  tracks: Track[];
+@Entity('favorites')
+export class Favorite {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+  @Column({ type: 'uuid' })
+  entityId: string;
+  @Column({ type: 'varchar', length: 20 })
+  entityType: 'artist' | 'album' | 'track';
 }
