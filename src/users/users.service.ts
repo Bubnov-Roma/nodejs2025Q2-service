@@ -3,54 +3,52 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from './entities/user.entity';
+import { User } from '../database/entities/user.entity';
 import { CreateUserDto, UpdatePasswordDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { randomUUID } from 'crypto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
+  constructor(
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
       Number(process.env.CRYPT_SALT) || 10,
     );
-    const user: User = {
-      id: randomUUID(),
+    const user = this.usersRepository.create({
       login: createUserDto.login,
       password: hashedPassword,
       version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-
-    this.users.push(user);
-    return user;
+    });
+    return await this.usersRepository.save(user);
   }
 
-  findAll(): User[] {
-    return this.users;
+  async findAll(): Promise<User[]> {
+    return await this.usersRepository.find();
   }
 
-  findOne(id: string): User {
-    const user = this.users.find((u) => u.id === id);
+  async findOne(id: string): Promise<User> {
+    const user = this.usersRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
     return user;
   }
 
-  findByLogin(login: string): User | undefined {
-    return this.users.find((u) => u.login === login);
+  async findByLogin(login: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { login } });
   }
 
   async update(
     id: string,
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<User> {
-    const user = this.findOne(id);
+    const user = await this.findOne(id);
 
     const isOldPasswordValid = await bcrypt.compare(
       updatePasswordDto.oldPassword,
@@ -67,16 +65,14 @@ export class UsersService {
     );
     user.password = hashedNewPassword;
     user.version += 1;
-    user.updatedAt = Date.now();
 
-    return user;
+    return await this.usersRepository.save(user);
   }
 
-  remove(id: string): void {
-    const index = this.users.findIndex((u) => u.id === id);
-    if (index === -1) {
+  async remove(id: string): Promise<void> {
+    const result = await this.usersRepository.delete(id);
+    if (result.affected === 0) {
       throw new NotFoundException('User not found');
     }
-    this.users.splice(index, 1);
   }
 }

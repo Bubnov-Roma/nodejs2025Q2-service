@@ -1,44 +1,43 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Artist } from './entities/artist.entity';
+import { Artist } from '../database/entities/artist.entity';
 import { CreateArtistDto, UpdateArtistDto } from './dto/create-artist.dto';
-import { randomUUID } from 'crypto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ArtistsService {
-  private artists: Artist[] = [];
+  constructor(
+    @InjectRepository(Artist)
+    private artistsRepository: Repository<Artist>,
+  ) {}
 
-  create(createArtistDto: CreateArtistDto): Artist {
-    const artist: Artist = {
-      id: randomUUID(),
-      ...createArtistDto,
-    };
-    this.artists.push(artist);
-    return artist;
+  async create(createArtistDto: CreateArtistDto): Promise<Artist> {
+    const artist: Artist = this.artistsRepository.create(createArtistDto);
+    return await this.artistsRepository.save(artist);
   }
 
-  findAll(): Artist[] {
-    return this.artists;
+  async findAll(): Promise<Artist[]> {
+    return await this.artistsRepository.find();
   }
 
-  findOne(id: string): Artist {
-    const artist = this.artists.find((a) => a.id === id);
+  async findOne(id: string): Promise<Artist> {
+    const artist = await this.artistsRepository.findOne({ where: { id } });
     if (!artist) {
       throw new NotFoundException('Artist not found');
     }
     return artist;
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto): Artist {
-    const artist = this.findOne(id);
-    Object.assign(artist, updateArtistDto);
-    return artist;
+  async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
+    await this.findOne(id);
+    await this.artistsRepository.update(id, updateArtistDto);
+    return await this.findOne(id);
   }
 
-  remove(id: string): void {
-    const index = this.artists.findIndex((a) => a.id === id);
-    if (index === -1) {
+  async remove(id: string): Promise<void> {
+    const result = await this.artistsRepository.delete(id);
+    if (result.affected === 0) {
       throw new NotFoundException('Artist not found');
     }
-    this.artists.splice(index, 1);
   }
 }
