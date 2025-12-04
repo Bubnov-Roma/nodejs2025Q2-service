@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: home-library-postgres-dev
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - postgres_logs_dev:/var/log/postgresql
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    networks:
+      - home-library-network-dev
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: home-library-app-dev
+    restart: always
+    ports:
+      - '${PORT}:4000'
+    environment:
+      PORT: ${PORT}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      CRYPT_SALT: ${CRYPT_SALT}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_SECRET_REFRESH_KEY: ${JWT_SECRET_REFRESH_KEY}
+      TOKEN_EXPIRE_TIME: ${TOKEN_EXPIRE_TIME}
+      TOKEN_REFRESH_EXPIRE_TIME: ${TOKEN_REFRESH_EXPIRE_TIME}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - home-library-network-dev
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./nest-cli.json:/app/nest-cli.json
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+      # Logs
+      - app_logs_dev:/app/logs
+
+networks:
+  home-library-network-dev:
+    driver: bridge
+    name: home-library-network-dev
+
+volumes:
+  postgres_data_dev:
+    driver: local
+    name: home-library-postgres-data-dev
+  postgres_logs_dev:
+    driver: local
+    name: home-library-postgres-logs-dev
+  app_logs_dev:
+    driver: local
+    name: home-library-app-logs-dev
