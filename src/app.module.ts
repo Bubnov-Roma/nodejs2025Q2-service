@@ -1,31 +1,44 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ArtistsModule } from './artists/artists.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
-import { AlbumsModule } from './albums/album.module';
+import { ArtistsModule } from './artists/artists.module';
 import { TracksModule } from './tracks/tracks.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { AlbumsModule } from './albums/album.module';
+import { Album } from './database/entities/album.entity';
+import { Artist } from './database/entities/artist.entity';
+import { Favorite } from './database/entities/favorite.entity';
+import { Track } from './database/entities/track.entity';
+import { User } from './database/entities/user.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.POSTGRES_HOST || 'localhost',
-      port: parseInt(process.env.POSTGRES_PORT, 10) || 5432,
-      username: process.env.POSTGRES_USER || 'postgres',
-      password: process.env.POSTGRES_PASSWORD || 'postgres',
-      database: process.env.POSTGRES_DB || 'home_library',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
-      logging: true,
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('POSTGRES_HOST', 'localhost'),
+        port: configService.get('POSTGRES_PORT', 5432),
+        username: configService.get('POSTGRES_USER', 'postgres'),
+        password: configService.get('POSTGRES_PASSWORD', 'postgres'),
+        database: configService.get('POSTGRES_DB', 'home_library'),
+        entities: [User, Artist, Album, Track, Favorite],
+        synchronize: true,
+        logging: true,
+        autoLoadEntities: false,
+      }),
     }),
+
+    TypeOrmModule.forFeature([User, Artist, Album, Track, Favorite]),
+
     UsersModule,
     ArtistsModule,
     AlbumsModule,
@@ -33,7 +46,5 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     FavoritesModule,
     AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

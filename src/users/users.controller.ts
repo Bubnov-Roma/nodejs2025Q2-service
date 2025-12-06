@@ -32,18 +32,19 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    const users = this.usersService.findAll();
+  async findAll() {
+    const users = await this.usersService.findAll();
     return users.map(({ password: _, ...user }) => user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     if (!isUUID(id)) {
       throw new BadRequestException('Invalid userID');
     }
-    const { password: _, ...user } = this.usersService.findOne(id);
-    return user;
+    const user = await this.usersService.findOne(id);
+    const { password: _, ...result } = user;
+    return result;
   }
 
   @Put(':id')

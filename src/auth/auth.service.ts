@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
 
   async signup(signupDto: SignupDto) {
-    const existingUser = this.userService.findByLogin(signupDto.login);
+    const existingUser = await this.userService.findByLogin(signupDto.login);
     if (existingUser) {
       throw new ConflictException('Login already exist');
     }
@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = this.userService.findByLogin(loginDto.login);
+    const user = await this.userService.findByLogin(loginDto.login);
     if (!user) {
       throw new ForbiddenException('Incorrect login or password');
     }
