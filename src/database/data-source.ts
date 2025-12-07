@@ -6,17 +6,20 @@ import { Track } from 'src/database/entities/track.entity';
 import { User } from 'src/database/entities/user.entity';
 import { DataSource } from 'typeorm';
 
-config();
+config({
+  path: process.env.NODE_ENV === 'development' ? '.env.local' : '.env',
+});
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: process.env.POSTGRES_HOST || 'localhost',
-  port: parseInt(process.env.POSTGRES_PORT) || 5432,
+  port: parseInt(process.env.POSTGRES_PORT || '5432'),
   username: process.env.POSTGRES_USER || 'postgres',
   password: process.env.POSTGRES_PASSWORD || 'postgres',
   database: process.env.POSTGRES_DB || 'home_library',
-  entities: [User, Artist, Album, Track, Favorite],
-  migrations: [__dirname + '/migrations/**/*{ts,js}'],
-  synchronize: true,
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/migrations/*.{ts,js}'],
+  synchronize: false,
   logging: true,
+  migrationsTableName: 'migrations',
 });

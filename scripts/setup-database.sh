@@ -20,27 +20,53 @@ if [ -f .env ]; then
     export $(cat .env | grep -v '^#' | xargs)
 else
     echo -e "${RED}❌ .env file not found${NC}"
+    echo "Please create .env file based on .env.example"
     exit 1
 fi
 
-# Check if PostgreSQL container is running
+# Check if Docker is running
+if ! docker info > /dev/null 2>&1; then
+    echo -e "${RED}❌ Docker is not running${NC}"
+    echo "Please start Docker and try again"
+    exit 1
+fi
+
+# Start PostgreSQL container if not running
 echo -e "${BLUE}🔍 Checking PostgreSQL container...${NC}"
-if ! docker ps | grep -q "home-library-postgres"; then
+if ! docker ps | grep -q "postgres"; then
     echo -e "${YELLOW}⚠️  PostgreSQL container is not running${NC}"
     echo "Starting PostgreSQL..."
     docker-compose up postgres -d
     echo "Waiting for PostgreSQL to be ready..."
-    sleep 5
+    sleep 10
 fi
+
+# Wait for PostgreSQL to be ready
+echo -e "${BLUE}⏳ Waiting for PostgreSQL...${NC}"
+MAX_RETRIES=30
+RETRY_COUNT=0
+until docker exec $(docker ps -qf "name=postgres") pg_isready -U "$POSTGRES_USER" > /dev/null 2>&1; do
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+        echo -e "${RED}❌ PostgreSQL failed to start${NC}"
+        exit 1
+    fi
+    echo "Waiting for PostgreSQL... ($RETRY_COUNT/$MAX_RETRIES)"
+    sleep 1
+done
+
+echo -e "${GREEN}✅ PostgreSQL is ready${NC}"
+echo ""
 
 # Check if database exists
 echo -e "${BLUE}🔍 Checking if database exists...${NC}"
-DB_EXISTS=$(docker exec home-library-postgres psql -U "$POSTGRES_USER" -lqt | cut -d \| -f 1 | grep -w "$POSTGRES_DB" || echo "")
+CONTAINER_NAME=$(docker ps -qf "name=postgres")
+DB_EXISTS=$(docker exec $CONTAINER_NAME psql -U "$POSTGRES_USER" -lqt | cut -d \| -f 1 | grep -w "$POSTGRES_DB" || echo "")
 
 if [ -z "$DB_EXISTS" ]; then
     echo -e "${YELLOW}⚠️  Database '$POSTGRES_DB' does not exist${NC}"
     echo "Creating database..."
-    docker exec home-library-postgres createdb -U "$POSTGRES_USER" "$POSTGRES_DB"
+    docker exec $CONTAINER_NAME createdb -U "$POSTGRES_USER" "$POSTGRES_DB"
     echo -e "${GREEN}✅ Database created successfully${NC}"
 else
     echo -e "${GREEN}✅ Database '$POSTGRES_DB' already exists${NC}"
@@ -49,40 +75,7 @@ fi
 # List databases
 echo ""
 echo -e "${BLUE}📋 Available databases:${NC}"
-docker exec home-library-postgres psql -U "$POSTGRES_USER" -c "\l" | grep -E "(Name|$POSTGRES_DB|---)"
-
-# Check if migrations directory exists
-echo ""
-if [ ! -d "src/database/migrations" ]; then
-    echo -e "${YELLOW}⚠️  Migrations directory does not exist${NC}"
-    echo "Creating directory..."
-    mkdir -p src/database/migrations
-fi
-
-# Generate migrations if needed
-echo -e "${BLUE}🔄 Generating migrations...${NC}"
-if npm run migration:generate -- src/database/migrations/InitialMigration 2>&1 | grep -q "No changes"; then
-    echo -e "${GREEN}✅ No changes detected, migrations are up to date${NC}"
-elif [ $? -eq 0 ]; then
-    echo -e "${GREEN}✅ Migrations generated successfully${NC}"
-else
-    echo -e "${YELLOW}⚠️  Could not generate migrations (may be already applied)${NC}"
-fi
-
-# Run migrations
-echo ""
-echo -e "${BLUE}🚀 Running migrations...${NC}"
-if npm run migration:run; then
-    echo -e "${GREEN}✅ Migrations applied successfully${NC}"
-else
-    echo -e "${RED}❌ Failed to apply migrations${NC}"
-    exit 1
-fi
-
-# Show tables
-echo ""
-echo -e "${BLUE}📊 Database tables:${NC}"
-docker exec home-library-postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "\dt"
+docker exec $CONTAINER_NAME psql -U "$POSTGRES_USER" -c "\l" | grep -E "(Name|$POSTGRES_DB|---)"
 
 echo ""
 echo -e "${GREEN}🎉 Database setup complete!${NC}"

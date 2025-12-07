@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install ALL dependencies (including devDependencies for build and migrations)
+RUN npm ci && npm cache clean --force
 
 # Copy source code
 COPY . .
@@ -25,11 +25,15 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install ALL dependencies including devDependencies for migrations
+RUN npm ci && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
+# Copy source files for TypeORM CLI
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/tsconfig*.json ./
+COPY --from=builder /app/nest-cli.json ./
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \

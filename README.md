@@ -10,116 +10,311 @@ A RESTful API service for managing a home music library with support for users, 
 - **Tracks**: Manage individual track information with artist and album relationships
 - **Favorites**: Add and manage favorite artists, albums, and tracks
 - **Authentication**: JWT-based authentication with access and refresh tokens
+- **Database**: PostgreSQL with TypeORM
+- **Docker**: Fully containerized application with Docker Compose
 - **Cascade Deletion**: Automatic cleanup of references when entities are deleted
 - **Validation**: Comprehensive input validation using class-validator
-- **In-Memory Storage**: Fast data access with in-memory storage (ready for database migration)
 
-## [Setup instructions](./doc/SETUP_INSTRUCTIONS.md)
+## Prerequisites
 
-Current development branch of this sprint "origin/feat/one"
+- **Docker** (>= 20.x) - [Download & Install Docker](https://docs.docker.com/get-docker/)
+- **Docker Compose** (>= 2.x) - Usually included with Docker Desktop
+- **Node.js** (>= 22.14.0) - Only required for local development without Docker
+- **npm** - Included with Node.js
 
-## [Documentation](./doc/api.yaml)
+## Quick Start with Docker (Recommended)
 
-## [Structure](./doc/PROJECT_STRUCTURE.md)
-
-## [Endpoints](./doc/API_Endpoints.md)
-
-## [Testing](./doc/TESTING.md)
-
-## Testing
-
-### ⚠️ To check tests without authorization, please comment the TODO lines in the files:
-
-[albums](./src/albums/albums.controller.ts)
-[artists](./src/artists/artists.controller.ts)
-[favorites](./src/favorites/favorites.controller.ts)
-[tracks](./src/tracks/tracks.controller.ts)
-[users](./src/users/users.controller.ts)
-
-### and re-run server `npm run start` or `npm run start:dev`
-
-I very much apologize for the inconvenience caused when checking this assignment 🙏🙏🙏
-
-### Run all tests (without authorization)
+### 1. Clone the repository
 
 ```bash
+git clone git@github.com:Bubnov-Roma/nodejs2025Q2-service.git
+cd nodejs2025Q2-service
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file in the root directory:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set your Docker Hub username:
+
+```env
+PORT=4000
+
+CRYPT_SALT=10
+JWT_SECRET_KEY=your_secret_key_here
+JWT_SECRET_REFRESH_KEY=your_refresh_secret_key_here
+TOKEN_EXPIRE_TIME=1h
+TOKEN_REFRESH_EXPIRE_TIME=24h
+
+# Database
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=home_library
+
+# Docker Hub username
+DOCKER_USERNAME=yourusername
+```
+
+### 3. Run with Docker Compose
+
+**Development mode (with hot reload):**
+
+```bash
+npm run docker:dev
+```
+
+**Production mode:**
+
+```bash
+npm run docker:prod
+```
+
+The application will be available at `http://localhost:4000`
+
+### 4. Stop the application
+
+```bash
+npm run docker:down
+```
+
+## Local Development (Without Docker)
+
+If you prefer to run the application locally without Docker:
+
+### 1. Install PostgreSQL locally
+
+Make sure PostgreSQL is installed and running on your machine.
+
+### 2. Create database
+
+```bash
+createdb home_library
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Update `.env` file
+
+```env
+POSTGRES_HOST=localhost
+```
+
+### 5. Run the application
+
+```bash
+npm run start:dev
+```
+
+## Database Setup
+
+### Automatic Setup (with Docker)
+
+The database is automatically created when you run:
+
+```bash
+npm run docker:dev
+```
+
+### Manual Setup (if needed)
+
+If you need to manually set up the database:
+
+```bash
+# Make the script executable
+chmod +x scripts/setup-database.sh
+
+# Run the setup script
+npm run db:setup
+```
+
+This script will:
+
+- Check if Docker is running
+- Start PostgreSQL container
+- Create the database if it doesn't exist
+- Show available databases
+
+## TypeORM Synchronization
+
+The application uses TypeORM's `synchronize: true` option in development, which automatically creates database tables based on your entities. This means:
+
+- No manual migrations needed in development
+- Tables are automatically created/updated when you change entities
+- Perfect for rapid development
+
+**Note**: In production, you should use migrations instead of synchronization.
+
+## Available Scripts
+
+### Docker Commands
+
+```bash
+# Build Docker images
+npm run docker:build
+
+# Start services in development mode
+npm run docker:dev
+
+# Start services in production mode
+npm run docker:prod
+
+# Stop all services
+npm run docker:down
+
+# Scan Docker images for vulnerabilities
+npm run docker:scan
+
+# Push images to Docker Hub
+npm run docker:push
+```
+
+### Application Commands
+
+```bash
+# Development with hot reload
+npm run start:dev
+
+# Production build and run
+npm run build
+npm run start:prod
+
+# Standard start
+npm run start
+```
+
+### Database Commands
+
+```bash
+# Setup database
+npm run db:setup
+```
+
+### Testing
+
+```bash
+# Run all tests (without authorization)
 npm run test
-```
 
-### Run tests with authorization
-
-```bash
+# Run tests with authorization
 npm run test:auth
-```
 
-### Run specific test suite
-
-```bash
+# Run specific test suite
 npm run test -- <path-to-suite>
-```
 
-### Run refresh token tests
-
-```bash
+# Run refresh token tests
 npm run test:refresh
 ```
 
-## Key Implementation Details
+### Code Quality
 
-### Authentication Flow
+```bash
+# Linting
+npm run lint
 
-1. User signs up via `/auth/signup`
-2. User logs in via `/auth/login` and receives access and refresh tokens
-3. Access token is used for API requests (valid for 1 hour by default)
-4. When access token expires, use refresh token at `/auth/refresh` to get new token pair
-5. All protected endpoints require `Authorization: Bearer <access-token>` header
+# Formatting
+npm run format
+```
 
-### Cascade Deletion
+## Docker Configuration
 
-When entities are deleted:
+### Networks
 
-- **Artist deletion**:
-  - Sets `artistId` to `null` in related albums and tracks
-  - Removes artist from favorites
-- **Album deletion**:
-  - Sets `albumId` to `null` in related tracks
-  - Removes album from favorites
-- **Track deletion**:
-  - Removes track from favorites
+The application uses a custom bridge network (`home-library-network`) for communication between containers:
 
-### Validation Rules
+- **Production**: `home-library-network`
+- **Development**: `home-library-network-dev`
 
-- **User login**: Required string
-- **User password**: Required string (hashed with bcrypt)
-- **Artist name**: Required string
-- **Artist grammy**: Required boolean
-- **Album name**: Required string
-- **Album year**: Required number
-- **Track name**: Required string
-- **Track duration**: Required number (in seconds)
-- **All IDs**: Must be valid UUID v4 format
+### Volumes
 
-### Security Features
+Persistent data is stored in Docker volumes:
 
-- Passwords are hashed using bcrypt with configurable salt rounds
-- JWT tokens with separate secrets for access and refresh tokens
-- Password field is always excluded from API responses
-- All routes (except auth) are protected with JWT guard
+- `postgres_data`: PostgreSQL database files
+- `postgres_logs`: PostgreSQL logs
+- `app_logs`: Application logs
 
-## Debugging
+### Health Checks
 
-### VSCode Debugging
+Both containers have health checks configured:
 
-Press **F5** to start debugging.
+- **PostgreSQL**: Checks if database is ready to accept connections
+- **Application**: HTTP health check on port 4000
 
-For more information about debugging in VSCode, visit: https://code.visualstudio.com/docs/editor/debugging
+### Auto-restart
 
-## Future Enhancements
+All containers are configured with `restart: always` policy, ensuring they automatically restart after crashes or system reboots.
 
-The current implementation uses in-memory storage. The architecture is designed to easily migrate to:
+## API Documentation
 
-- PostgreSQL with TypeORM
-- MongoDB with Mongoose
-- Any other database solution
+See [API Endpoints](./doc/API_Endpoints.md) for detailed API documentation.
 
-Simply replace the service layer implementations while keeping the same interfaces.
+## Project Structure
+
+See [Project Structure](./doc/PROJECT_STRUCTURE.md) for detailed project structure.
+
+## Testing
+
+See [Testing Guide](./doc/TESTING.md) for testing instructions.
+
+## Security
+
+- Passwords are hashed using bcrypt
+- JWT tokens for authentication
+- Environment variables for sensitive data
+- Docker image vulnerability scanning available
+
+## Troubleshooting
+
+### Database connection errors
+
+If you see "database does not exist" errors:
+
+1. Make sure Docker is running
+2. Run the database setup script:
+   ```bash
+   npm run db:setup
+   ```
+3. Restart the application
+
+### Port already in use
+
+If port 4000 or 5432 is already in use:
+
+1. Stop conflicting services
+2. Or change ports in `.env` file
+
+### Docker volume issues
+
+If you need to reset the database:
+
+```bash
+# Stop all services
+npm run docker:down
+
+# Remove volumes
+docker volume rm home-library-postgres-data
+
+# Start again
+npm run docker:dev
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feat/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feat/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the UNLICENSED License.

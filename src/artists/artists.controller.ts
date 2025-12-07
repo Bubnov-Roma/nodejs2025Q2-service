@@ -11,7 +11,7 @@ import {
   Param,
   Post,
   Put,
-  UseGuards /* TODO: needs to be commented out for check tests without authorization */,
+  // UseGuards /* TODO: needs to be commented out for check tests without authorization */,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto, UpdateArtistDto } from './dto/create-artist.dto';
@@ -19,12 +19,12 @@ import { validate as isUUID } from 'uuid';
 import { AlbumsService } from 'src/albums/albums.service';
 import { TracksService } from 'src/tracks/tracks.service';
 import { FavoritesService } from 'src/favorites/favorites.service';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'; /* TODO: needs to be commented out for check tests without authorization */
+// import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'; /* TODO: needs to be commented out for check tests without authorization */
 
 @Controller('artist')
-@UseGuards(
-  JwtAuthGuard,
-) /* TODO: needs to be commented out for check tests without authorization */
+// @UseGuards(
+//   JwtAuthGuard,
+// ) /* TODO: needs to be commented out for check tests without authorization */
 export class ArtistsController {
   constructor(
     private readonly artistsService: ArtistsService,

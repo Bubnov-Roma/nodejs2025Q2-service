@@ -29,20 +29,30 @@ echo "🔍 Scanning Docker image..."
 IMAGE_NAME="home-library-app:latest"
 
 if docker images | grep -q "home-library-app"; then
-if command -v docker scout &> /dev/null; then
-echo "Using Docker Scout..."
-docker scout cves $IMAGE_NAME
-elif command -v trivy &> /dev/null; then
-echo "Using Trivy..."
-trivy image $IMAGE_NAME
+#     echo "Using local image for scanning..."
+
+#     if command -v trivy &> /dev/null; then
+#         echo "Using Trivy..."
+#         trivy image --input docker-archive:$(docker save $IMAGE_NAME -o /tmp/image.tar) /tmp/image.tar
+#     else
+#         echo -e "${YELLOW}⚠️ Install Trivy for better scanning${NC}"
+
+    if command -v docker scout &> /dev/null; then
+        echo "Using Docker Scout..."
+        docker scout cves $IMAGE_NAME
+    elif command -v trivy &> /dev/null; then
+        echo "Using Trivy..."
+        trivy image $IMAGE_NAME
+    else
+        echo -e "${YELLOW}⚠️ No Docker scanning tool found.${NC}"
+        echo "Install Docker Scout or Trivy for image scanning"
+        echo "- Docker Scout: comes with Docker Desktop"
+        echo "- Trivy: brew install trivy (macOS) or see https://github.com/aquasecurity/trivy"
+        
+    fi
 else
-echo -e "${YELLOW}⚠️ No Docker scanning tool found.${NC}"
-echo "Install Docker Scout or Trivy for image scanning"
-echo "- Docker Scout: comes with Docker Desktop"
-echo "- Trivy: brew install trivy (macOS) or see https://github.com/aquasecurity/trivy"
-fi
-else
-echo -e "${YELLOW}⚠️ Docker image $IMAGE_NAME not found. Please build the image before scanning.${NC}"
+    echo -e "${YELLOW}⚠️ Docker image $IMAGE_NAME not found.${NC}"
+    echo "Build the image first: npm run docker:build"
 fi
 echo ""
 echo "🔍 Scan completed!"

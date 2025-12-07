@@ -12,7 +12,7 @@ import { Favorite } from 'src/database/entities/favorite.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Track, Artist, Album, Favorite]),
+    TypeOrmModule.forFeature([Artist, Track, Album, Favorite]),
     forwardRef(() => TracksModule),
     forwardRef(() => AlbumsModule),
     forwardRef(() => FavoritesModule),
