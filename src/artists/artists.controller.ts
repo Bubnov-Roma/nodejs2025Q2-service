@@ -69,9 +69,9 @@ export class ArtistsController {
     if (!isUUID(id)) {
       throw new BadRequestException('Invalid artist ID');
     }
-    this.artistsService.remove(id);
+    this.favoritesService.removeArtistFromFavorites(id);
     this.albumsService.nullifyArtistId(id);
     this.tracksService.nullifyArtistId(id);
-    this.favoritesService.removeArtistFromFavorites(id);
+    this.artistsService.remove(id);
   }
 }

@@ -4,6 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { LoginDto, SignupDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
@@ -13,6 +14,7 @@ export class AuthService {
   constructor(
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async signup(signupDto: SignupDto) {
@@ -43,14 +45,15 @@ export class AuthService {
     const payload = { userId: user.id, login: user.login };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET_KEY,
-      expiresIn: process.env.TOKEN_EXPIRE_TIME || '1h',
-    });
+      secret: this.configService.get<string>('JWT_SECRET_KEY'),
+      expiresIn: this.configService.get<string>('TOKEN_EXPIRE_TIME') ?? '1h',
+    } as any);
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET_REFRESH_KEY,
-      expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME || '24h',
-    });
+      secret: this.configService.get<string>('JWT_SECRET_REFRESH_KEY'),
+      expiresIn:
+        this.configService.get<string>('TOKEN_REFRESH_EXPIRE_TIME') ?? '24h',
+    } as any);
 
     return {
       accessToken,
@@ -61,19 +64,20 @@ export class AuthService {
   async refresh(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken, {
-        secret: process.env.JWT_SECRET_REFRESH_KEY,
+        secret: this.configService.get<string>('JWT_SECRET_REFRESH_KEY'),
       });
 
       const newPayLoad = { userId: payload.userId, login: payload.login };
       const accessToken = this.jwtService.sign(newPayLoad, {
-        secret: process.env.JWT_SECRET_KEY,
-        expiresIn: process.env.TOKEN_EXPIRE_TIME || '1h',
-      });
+        secret: this.configService.get<string>('JWT_SECRET_KEY'),
+        expiresIn: this.configService.get<string>('TOKEN_EXPIRE_TIME') ?? '1h',
+      } as any);
 
       const newRefreshToken = this.jwtService.sign(newPayLoad, {
-        secret: process.env.JWT_SECRET_REFRESH_KEY,
-        expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME || '24h',
-      });
+        secret: this.configService.get<string>('JWT_SECRET_REFRESH_KEY'),
+        expiresIn:
+          this.configService.get<string>('TOKEN_REFRESH_EXPIRE_TIME') ?? '24h',
+      } as any);
 
       return {
         accessToken,

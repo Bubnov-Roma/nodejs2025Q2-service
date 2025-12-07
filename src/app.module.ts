@@ -1,17 +1,14 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { ArtistsModule } from './artists/artists.module';
 import { TracksModule } from './tracks/tracks.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { AuthModule } from './auth/auth.module';
 import { AlbumsModule } from './albums/album.module';
-import { Album } from './database/entities/album.entity';
-import { Artist } from './database/entities/artist.entity';
-import { Favorite } from './database/entities/favorite.entity';
-import { Track } from './database/entities/track.entity';
-import { User } from './database/entities/user.entity';
+import { PrismaModule } from './prisma/prisma.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -19,26 +16,7 @@ import { User } from './database/entities/user.entity';
       isGlobal: true,
       envFilePath: '.env',
     }),
-
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('POSTGRES_HOST', 'localhost'),
-        port: configService.get('POSTGRES_PORT', 5432),
-        username: configService.get('POSTGRES_USER', 'postgres'),
-        password: configService.get('POSTGRES_PASSWORD', 'postgres'),
-        database: configService.get('POSTGRES_DB', 'home_library'),
-        entities: [User, Artist, Album, Track, Favorite],
-        synchronize: false,
-        logging: configService.get('NODE_ENV') === 'development',
-        autoLoadEntities: false,
-      }),
-    }),
-
-    TypeOrmModule.forFeature([User, Artist, Album, Track, Favorite]),
-
+    PrismaModule,
     UsersModule,
     ArtistsModule,
     AlbumsModule,
@@ -46,5 +24,7 @@ import { User } from './database/entities/user.entity';
     FavoritesModule,
     AuthModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

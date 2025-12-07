@@ -1,42 +1,49 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Artist } from '../database/entities/artist.entity';
 import { CreateArtistDto, UpdateArtistDto } from './dto/create-artist.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { PrismaService } from '../prisma/prisma.service';
+import { Artist } from '@prisma/client';
 
 @Injectable()
 export class ArtistsService {
-  constructor(
-    @InjectRepository(Artist)
-    private artistsRepository: Repository<Artist>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createArtistDto: CreateArtistDto): Promise<Artist> {
-    const artist: Artist = this.artistsRepository.create(createArtistDto);
-    return await this.artistsRepository.save(artist);
+    return this.prisma.artist.create({
+      data: createArtistDto,
+    });
   }
 
   async findAll(): Promise<Artist[]> {
-    return await this.artistsRepository.find();
+    return this.prisma.artist.findMany();
   }
 
   async findOne(id: string): Promise<Artist> {
-    const artist = await this.artistsRepository.findOne({ where: { id } });
+    const artist = await this.prisma.artist.findUnique({
+      where: { id },
+    });
+
     if (!artist) {
       throw new NotFoundException('Artist not found');
     }
+
     return artist;
   }
 
   async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
     await this.findOne(id);
-    await this.artistsRepository.update(id, updateArtistDto);
-    return await this.findOne(id);
+
+    return this.prisma.artist.update({
+      where: { id },
+      data: updateArtistDto,
+    });
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.artistsRepository.delete(id);
-    if (result.affected === 0) {
+    try {
+      await this.prisma.artist.delete({
+        where: { id },
+      });
+    } catch (error) {
       throw new NotFoundException('Artist not found');
     }
   }

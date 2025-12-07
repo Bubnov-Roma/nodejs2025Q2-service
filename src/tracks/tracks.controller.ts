@@ -63,7 +63,7 @@ export class TracksController {
     if (!isUUID(id)) {
       throw new BadRequestException('Invalid track ID');
     }
-    this.tracksService.remove(id);
     this.favoritesService.removeTrackFromFavorites(id);
+    this.tracksService.remove(id);
   }
 }

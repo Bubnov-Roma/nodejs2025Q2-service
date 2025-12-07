@@ -3,45 +3,50 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '../database/entities/user.entity';
 import { CreateUserDto, UpdatePasswordDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
       Number(process.env.CRYPT_SALT) || 10,
     );
-    const user = this.usersRepository.create({
-      login: createUserDto.login,
-      password: hashedPassword,
-      version: 1,
+
+    return this.prisma.user.create({
+      data: {
+        login: createUserDto.login,
+        password: hashedPassword,
+        version: 1,
+      },
     });
-    return await this.usersRepository.save(user);
   }
 
   async findAll(): Promise<User[]> {
-    return await this.usersRepository.find();
+    return this.prisma.user.findMany();
   }
 
   async findOne(id: string): Promise<User> {
-    const user = this.usersRepository.findOne({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     return user;
   }
 
   async findByLogin(login: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { login } });
+    return this.prisma.user.findUnique({
+      where: { login },
+    });
   }
 
   async update(
@@ -63,15 +68,25 @@ export class UsersService {
       updatePasswordDto.newPassword,
       Number(process.env.CRYPT_SALT) || 10,
     );
-    user.password = hashedNewPassword;
-    user.version += 1;
 
-    return await this.usersRepository.save(user);
+    const now = BigInt(Date.now());
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        password: hashedNewPassword,
+        version: { increment: 1 },
+        updatedAt: now,
+      },
+    });
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.usersRepository.delete(id);
-    if (result.affected === 0) {
+    try {
+      await this.prisma.user.delete({
+        where: { id },
+      });
+    } catch (error) {
       throw new NotFoundException('User not found');
     }
   }

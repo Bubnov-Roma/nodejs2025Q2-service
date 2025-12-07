@@ -1,14 +1,17 @@
-# Build
+# Build stage
 FROM node:24-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Install ALL dependencies (including devDependencies for build and migrations)
+# Install dependencies
 RUN npm ci && npm cache clean --force
+
+# Generate Prisma Client
+RUN npx prisma generate
 
 # Copy source code
 COPY . .
@@ -16,24 +19,30 @@ COPY . .
 # Build application
 RUN npm run build
 
-# Production
+# Production stage
 FROM node:24-alpine
 
-# Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Install ALL dependencies including devDependencies for migrations
-RUN npm ci && npm cache clean --force
+# Install production dependencies only
+RUN npm ci --only=production && npm cache clean --force
 
-# Copy built application from builder stage
+# Install Prisma CLI for migrations
+RUN npm install -g prisma
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Copy built application
 COPY --from=builder /app/dist ./dist
-# Copy source files for TypeORM CLI
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/tsconfig*.json ./
-COPY --from=builder /app/nest-cli.json ./
+
+# Copy startup script
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -52,5 +61,5 @@ EXPOSE 4000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
   CMD node -e "require('http').get('http://localhost:4000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Start application
-CMD ["node", "dist/main"]
+# Start application with migrations
+ENTRYPOINT ["./docker-entrypoint.sh"]

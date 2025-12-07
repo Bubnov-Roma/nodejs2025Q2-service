@@ -66,8 +66,8 @@ export class AlbumsController {
     if (!isUUID(id)) {
       throw new BadRequestException('Invalid album ID');
     }
-    this.albumsService.remove(id);
-    this.tracksService.nullifyAlbumId(id);
     this.favoritesService.removeAlbumFromFavorites(id);
+    this.tracksService.nullifyAlbumId(id);
+    this.albumsService.remove(id);
   }
 }
