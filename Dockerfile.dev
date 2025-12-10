@@ -1,0 +1,39 @@
+# ============================================
+# Development with hot reload
+# ============================================
+FROM node:24-alpine
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init && \
+    rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+# Copy package files first (better caching)
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Configure npm for better stability
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000
+
+# Install dependencies
+RUN npm install --prefer-offline --no-audit --progress=false && \
+    npm cache clean --force
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Copy tsconfig and nest config
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+
+# Source files will be mounted as volume
+EXPOSE 4000
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start in watch mode
+CMD ["npm", "run", "start:dev"]

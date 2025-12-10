@@ -1,0 +1,70 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build
+dist
+build
+.next
+
+# Testing
+coverage
+.nyc_output
+test
+*.spec.ts
+*.e2e-spec.ts
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Documentation
+README.md
+docs
+doc
+*.md
+
+# Docker
+Dockerfile
+Dockerfile.dev
+docker-compose.yml
+docker-compose.dev.yml
+docker-compose.postgres.yml
+.dockerignore
+
+# Misc
+.prettierrc
+.eslintrc.js
+.editorconfig
+
+# Database
+prisma/migrations/.migration_lock
+
+# Generated files
+generated/prisma/
+
+# Build artifacts
+build.log
