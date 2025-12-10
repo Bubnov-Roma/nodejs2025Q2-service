@@ -65,13 +65,13 @@ export class ArtistsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     if (!isUUID(id)) {
       throw new BadRequestException('Invalid artist ID');
     }
-    this.favoritesService.removeArtistFromFavorites(id);
-    this.albumsService.nullifyArtistId(id);
-    this.tracksService.nullifyArtistId(id);
-    this.artistsService.remove(id);
+    await this.favoritesService.removeArtistFromFavorites(id);
+    await this.albumsService.nullifyArtistId(id);
+    await this.tracksService.nullifyArtistId(id);
+    await this.artistsService.remove(id);
   }
 }

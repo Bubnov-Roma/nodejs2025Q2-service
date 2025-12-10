@@ -11,6 +11,9 @@ build
 # Testing
 coverage
 .nyc_output
+test
+*.spec.ts
+*.e2e-spec.ts
 
 # Environment
 .env
@@ -21,6 +24,7 @@ coverage
 .git
 .gitignore
 .gitattributes
+.github
 
 # IDE
 .vscode
@@ -40,20 +44,27 @@ logs
 # Documentation
 README.md
 docs
+doc
+*.md
 
 # Docker
 Dockerfile
 Dockerfile.dev
 docker-compose.yml
 docker-compose.dev.yml
+docker-compose.postgres.yml
 .dockerignore
-
-# Tests
-test
-*.spec.ts
-*.e2e-spec.ts
 
 # Misc
 .prettierrc
 .eslintrc.js
 .editorconfig
+
+# Database
+prisma/migrations/.migration_lock
+
+# Generated files
+generated/prisma/
+
+# Build artifacts
+build.log

@@ -1,65 +1,66 @@
+# ============================================
 # Build stage
+# ============================================
 FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy only package files first
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm ci && npm cache clean --force
+# Install dependencies with optimizations
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm ci --prefer-offline --no-audit --progress=false && \
+    npx prisma generate && \
+    npm cache clean --force
 
-# Generate Prisma Client
-RUN npx prisma generate
-
-# Copy source code
-COPY . .
+# Copy source files
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+COPY src ./src
 
 # Build application
 RUN npm run build
 
+# Remove dev dependencies after build
+RUN npm prune --omit=dev
+
+# ============================================
 # Production stage
+# ============================================
 FROM node:24-alpine
 
+# Install only essential runtime dependencies
+RUN apk add --no-cache dumb-init && \
+    rm -rf /var/cache/apk/*
+
 WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-COPY prisma ./prisma/
-
-# Install production dependencies only
-RUN npm ci --only=production && npm cache clean --force
-
-# Install Prisma CLI for migrations
-RUN npm install -g prisma
-
-# Generate Prisma Client
-RUN npx prisma generate
-
-# Copy built application
-COPY --from=builder /app/dist ./dist
-
-# Copy startup script
-COPY docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Change ownership
-RUN chown -R nodejs:nodejs /app
+# Copy only necessary files from builder
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
+
+# Copy and prepare entrypoint
+COPY --chown=nodejs:nodejs scripts/docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
 
 # Switch to non-root user
 USER nodejs
 
-# Expose port
 EXPOSE 4000
 
-# Health check
+# Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
-  CMD node -e "require('http').get('http://localhost:4000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+    CMD node -e "require('http').get('http://localhost:4000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Start application with migrations
-ENTRYPOINT ["./docker-entrypoint.sh"]
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["./docker-entrypoint.sh"]

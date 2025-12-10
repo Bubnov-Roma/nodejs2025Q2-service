@@ -24,6 +24,7 @@ npm install
 Create a `.env` file in the root directory (use `.env.example` as a template):
 
 ```env
+NODE_ENV=development
 PORT=4000
 
 CRYPT_SALT=10
@@ -31,6 +32,23 @@ JWT_SECRET_KEY=secret123123
 JWT_SECRET_REFRESH_KEY=secret123123
 TOKEN_EXPIRE_TIME=1h
 TOKEN_REFRESH_EXPIRE_TIME=24h
+
+# PostgreSQL Configuration
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=home_library
+
+# Prisma Database
+# For LOCAL development (postgres on localhost)
+# DATABASE_URL="postgresql://postgres:postgres@localhost:5432/home_library?schema=public"
+
+# For DOCKER (postgres in container)
+DATABASE_URL="postgresql://postgres:postgres@postgres:5432/home_library?schema=public"
+
+# Docker Hub
+DOCKER_USERNAME=your_username
 ```
 
 ## Running the Application

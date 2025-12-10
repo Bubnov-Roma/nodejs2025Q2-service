@@ -59,6 +59,7 @@ services:
       - /app/node_modules
       # Logs
       - app_logs_dev:/app/logs
+    command: sh -c "npx prisma migrate deploy && npm run start:dev"
 
 networks:
   home-library-network-dev:

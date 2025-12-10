@@ -62,12 +62,12 @@ export class AlbumsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     if (!isUUID(id)) {
       throw new BadRequestException('Invalid album ID');
     }
-    this.favoritesService.removeAlbumFromFavorites(id);
-    this.tracksService.nullifyAlbumId(id);
-    this.albumsService.remove(id);
+    await this.favoritesService.removeAlbumFromFavorites(id);
+    await this.tracksService.nullifyAlbumId(id);
+    await this.albumsService.remove(id);
   }
 }
