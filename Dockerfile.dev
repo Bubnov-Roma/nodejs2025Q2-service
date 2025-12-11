@@ -29,6 +29,9 @@ RUN npx prisma generate
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
+# Create logs directory
+RUN mkdir -p logs
+
 # Source files will be mounted as volume
 EXPOSE 4000
 

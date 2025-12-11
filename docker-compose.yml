@@ -26,7 +26,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     image: ${DOCKER_USERNAME}/home-library-app:latest
     container_name: home-library-app
     restart: always
