@@ -17,16 +17,7 @@ export class LoggingInterceptor implements NestInterceptor {
     const { method, url, query, body } = request;
     const now = Date.now();
 
-    this.logger.log(
-      {
-        type: 'REQUEST',
-        method,
-        url,
-        query,
-        body: this.sanitizeBody(body),
-      },
-      'HTTP',
-    );
+    this.logger.logRequest(method, url, query, body);
 
     return next.handle().pipe(
       tap({
@@ -34,22 +25,13 @@ export class LoggingInterceptor implements NestInterceptor {
           const response = context.switchToHttp().getResponse();
           const delay = Date.now() - now;
 
-          this.logger.log(
-            {
-              type: 'RESPONSE',
-              method,
-              url,
-              statusCode: response.statusCode,
-              duration: `${delay}ms`,
-            },
-            'HTTP',
-          );
+          this.logger.logResponse(method, url, response.statusCode, delay);
         },
         error: (error) => {
           const delay = Date.now() - now;
           this.logger.error(
             {
-              type: 'RESPONSE_ERROR',
+              type: 'HTTP_ERROR',
               method,
               url,
               error: error.message,
@@ -61,20 +43,5 @@ export class LoggingInterceptor implements NestInterceptor {
         },
       }),
     );
-  }
-
-  private sanitizeBody(body: any): any {
-    if (!body) return body;
-    const sanitized = { ...body };
-    if (sanitized.password) {
-      sanitized.password = '***';
-    }
-    if (sanitized.oldPassword) {
-      sanitized.oldPassword = '***';
-    }
-    if (sanitized.newPassword) {
-      sanitized.newPassword = '***';
-    }
-    return sanitized;
   }
 }
