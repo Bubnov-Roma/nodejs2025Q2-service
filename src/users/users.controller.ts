@@ -9,17 +9,17 @@ import {
   Param,
   Post,
   Put,
-  // UseGuards /* TODO: needs to be commented out for check tests without authorization */,
+  UseGuards /* TODO: needs to be commented out for check tests without authorization */,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { validate as isUUID } from 'uuid';
 import { CreateUserDto, UpdatePasswordDto } from './dto/create-user.dto';
-// import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'; /* TODO: needs to be commented out for check tests without authorization */
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'; /* TODO: needs to be commented out for check tests without authorization */
 
 @Controller('user')
-// @UseGuards(
-//   JwtAuthGuard,
-// ) /* TODO: needs to be commented out for check tests without authorization */
+@UseGuards(
+  JwtAuthGuard,
+) /* TODO: needs to be commented out for check tests without authorization */
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
