@@ -9,13 +9,29 @@ import { AlbumsModule } from './albums/album.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { LoggingModule } from './common/logging/logging.module';
+import * as fs from 'fs';
+import * as path from 'path';
 
+function getEnvFilePath(): string {
+  const isDocker =
+    fs.existsSync('/.dockerenv') || process.env.DOCKER === 'true';
+  if (isDocker) {
+    return '.env';
+  }
+  const localEnvPath = path.resolve(process.cwd(), '.env.local');
+  if (fs.existsSync(localEnvPath)) {
+    return '.env.local';
+  }
+  return '.env';
+}
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: getEnvFilePath(),
     }),
+    LoggingModule,
     PrismaModule,
     UsersModule,
     ArtistsModule,
