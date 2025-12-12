@@ -1,324 +1,105 @@
 # Home Library Service
 
-A RESTful API service for managing a home music library with JWT authentication, PostgreSQL database, and Prisma ORM.
+A RESTful API service for managing a home music library with **JWT authentication**, **comprehensive logging & error handling**, PostgreSQL database, and Prisma ORM.
+
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.14.0-brightgreen)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-10.4-red)](https://nestjs.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
+
+## 📚 Documentation
+
+- **[Setup Instructions](doc/SETUP_INSTRUCTIONS.md)** - Installation and configuration
+- **[API Endpoints](doc/API_ENDPOINTS.md)** - Complete API reference
+- **[Authentication Guide](doc/AUTHENTICATION.md)** - JWT authentication & authorization
+- **[Logging System](doc/LOGGING.md)** - Logging & error handling
+- **[Testing Guide](doc/TESTING.md)** - How to run tests
+- **[Project Structure](doc/PROJECT_STRUCTURE.md)** - Architecture overview
+- **[Docker Guide](doc/DOCKER.md)** - Docker configuration & deployment
+- **[Troubleshooting](doc/TROUBLESHOOTING.md)** - Common issues and solutions
 
 ## 🚀 Features
 
-- **User Management**: JWT-based authentication with password hashing
+### Core Functionality
+
+- **User Management**: Full CRUD operations with version tracking
 - **Artists**: Manage artist information with Grammy awards tracking
 - **Albums**: Track album details with artist associations
 - **Tracks**: Individual track management with relationships
-- **Favorites**: Personal favorites system
+- **Favorites**: Personal favorites system for artists, albums, and tracks
+
+### Security & Authentication
+
+- **JWT Authentication**: Access and Refresh tokens
+- **Password Hashing**: bcrypt encryption for all passwords
+- **Protected Routes**: All endpoints except auth routes require valid JWT
+- **Token Refresh**: Seamless token renewal mechanism
+
+### Logging & Error Handling
+
+- **Custom Logging Service**: Multi-level logging system (error, warn, log, debug, verbose)
+- **HTTP Request/Response Logging**: Automatic logging of all HTTP traffic
+- **Global Exception Filter**: Centralized error handling with proper status codes
+- **Log Rotation**: Automatic rotation by file size
+- **Separate Error Logs**: Dedicated error log file for easy debugging
+- **Process Error Handling**: Handling of uncaughtException and unhandledRejection
+
+### Infrastructure
+
 - **Database**: PostgreSQL with Prisma ORM
 - **Docker**: Fully containerized with Docker Compose
 - **Auto-migrations**: Database migrations applied automatically
 - **Type Safety**: Full TypeScript + Prisma type generation
 - **Optimized Images**: Production image < 500MB
 
-## 📋 Prerequisites
+## ⚡ Quick Start
 
-- **Docker Desktop** (>= 20.x) with at least **4GB RAM** (6GB recommended) - [Download](https://docs.docker.com/get-docker/)
+### Prerequisites
+
+- **Docker Desktop** (>= 20.x) with at least **4GB RAM** (6GB recommended)
 - **Docker Compose** (>= 2.x)
 - **Node.js** (>= 22.14.0) - Only for local development
-- **npm** - Included with Node.js
 
-### Docker Desktop Configuration
-
-Before starting, configure Docker Desktop for optimal performance:
-
-**macOS/Windows:**
-
-1. Open Docker Desktop → Settings → Resources
-2. Memory: **6GB** (minimum 4GB)
-3. Swap: **2GB**
-4. Disk: **60GB**
-5. Click "Apply & Restart"
-
-## ⚡ Quick Start with Docker (Recommended)
-
-### 1. Clone the repository
+### Using Docker (Recommended)
 
 ```bash
+# 1. Clone repository
 git clone git@github.com:Bubnov-Roma/nodejs2025Q2-service.git
 cd nodejs2025Q2-service
-```
 
-### 2. Configure environment
-
-```bash
+# 2. Configure environment
 cp .env.example .env
-```
+# Edit .env and set DOCKER_USERNAME
 
-Edit `.env` and set your Docker Hub username:
-
-```env
-DOCKER_USERNAME=yourusername
-DATABASE_URL="postgresql://postgres:postgres@postgres:5432/home_library?schema=public"
-```
-
-### 3. Run with Docker Compose
-
-**Development mode (with hot reload):**
-
-```bash
+# 3. Start in development mode
 npm run docker:dev
+
+# Application will be available at http://localhost:4000
 ```
 
-- Image tag: `:dev`
-- Size: ~700MB (includes TypeScript, ESLint, tests - **this is normal!**)
-- Hot reload enabled
-- Source code mounted as volume
-
-**Production mode:**
+### Local Development
 
 ```bash
-npm run docker:prod
-```
-
-- Image tag: `:prod`
-- Size: ~400MB (only runtime dependencies)
-- Optimized for deployment
-- No dev tools included
-
-The application will be available at `http://localhost:4000`
-
-### 4. Stop the application
-
-```bash
-npm run docker:down
-```
-
-## 🐳 Docker Images
-
-This project creates **two separate Docker images**:
-
-| Image           | Tag     | Size   | Usage             | Contents                                |
-| --------------- | ------- | ------ | ----------------- | --------------------------------------- |
-| **Development** | `:dev`  | ~700MB | Local development | TypeScript, ESLint, Jest, all dev tools |
-| **Production**  | `:prod` | ~400MB | Deployment        | Only runtime dependencies, compiled JS  |
-
-**Note**: Development image is intentionally larger - it needs all development tools!
-
-## 🛠️ Local Development (Without Docker)
-
-### 1. Install PostgreSQL locally
-
-Ensure PostgreSQL is running on your machine.
-
-### 2. Install dependencies
-
-```bash
+# 1. Install dependencies
 npm install
-```
 
-### 3. Setup database
-
-```bash
-createdb home_library
-```
-
-### 4. Update `.env`
-
-```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/home_library?schema=public"
-```
-
-### 5. Run migrations
-
-```bash
-npx prisma migrate dev
-```
-
-### 6. Start the application
-
-```bash
-npm run start:dev
-```
-
-## 🗄️ Database & Prisma
-
-### Automatic Migrations
-
-Migrations are automatically applied when the Docker container starts. For local development:
-
-```bash
-# Create and apply migration
-npx prisma migrate dev --name migration_name
-
-# Apply existing migrations
-npx prisma migrate deploy
-
-# View database
-npx prisma studio
-```
-
-### Database Schema
-
-The database schema is defined in `prisma/schema.prisma`:
-
-- **Users**: Authentication and user management
-- **Artists**: Music artists with Grammy status
-- **Albums**: Albums with artist relationships
-- **Tracks**: Individual tracks with album/artist links
-- **Favorites**: User favorites system
-
-## 📜 Available Scripts
-
-### Docker Commands
-
-```bash
-# Build production image (with safety checks)
-npm run docker:build
-
-# Build quickly (uses cache)
-npm run docker:build:fast
-
-# Start in development mode (hot reload)
-npm run docker:dev
-
-# Start in production mode
-npm run docker:prod
-
-# Start in background (detached)
-npm run docker:prod:detached
-
-# Stop all services
-npm run docker:down
-
-# Check image sizes (dev vs prod)
-npm run docker:size
-
-# Analyze image contents (what's using space)
-npm run docker:analyze
-
-# Scan for vulnerabilities
-npm run docker:scan
-
-# Push to Docker Hub
-npm run docker:push
-
-# Start only PostgreSQL
+# 2. Start PostgreSQL
 npm run docker:postgres
 
-# Stop PostgreSQL
-npm run docker:postgres:down
+# 3. Configure .env.local for localhost
+cp .env.example .env.local
+# Edit DATABASE_URL to use localhost
 
-# Clean everything (removes volumes)
-npm run docker:clean
+# 4. Run migrations
+npx prisma migrate dev
 
-# Remove all Docker artifacts
-npm run docker:prune
-```
-
-### Application Commands
-
-```bash
-# Development with hot reload
+# 5. Start application
 npm run start:dev
-
-# Production build
-npm run build
-npm run start:prod
-
-# Standard start
-npm run start
 ```
 
-### Prisma Commands
+See **[Setup Instructions](doc/SETUP_INSTRUCTIONS.md)** for detailed guide.
 
-```bash
-# Generate Prisma Client
-npm run prisma:generate
-
-# Create and apply migration (dev)
-npm run prisma:migrate:dev
-
-# Apply migrations (production)
-npm run prisma:migrate
-
-# View database in browser
-npm run prisma:studio
-
-# Reset database
-npm run prisma:reset
-```
-
-### Testing
-
-```bash
-# All tests (comment TODO lines first)
-npm run test
-
-# Tests with authorization
-npm run test:auth
-
-# Refresh token tests
-npm run test:refresh
-```
-
-### Code Quality
-
-```bash
-# Linting
-npm run lint
-
-# Formatting
-npm run format
-```
-
-## 🐳 Docker Configuration
-
-### Multi-stage Build (Production)
-
-The production `Dockerfile` uses a three-stage build to minimize image size:
-
-1. **Builder stage**: Installs all dependencies and builds the application
-2. **Deps stage**: Installs only production dependencies (clean install)
-3. **Production stage**: Minimal final image with optimized node_modules
-
-**Production image size**: ~400MB (< 500MB ✅)
-
-### Development Build
-
-The development `Dockerfile.dev` is simpler:
-
-- Single stage with all dependencies
-- Source code mounted as volume for hot reload
-- Includes all dev tools (TypeScript, ESLint, Jest)
-
-**Development image size**: ~700MB (includes all dev tools - **this is expected!**)
-
-### Networks
-
-Custom bridge network for service communication:
-
-- **Production**: `home-library-network`
-- **Development**: `home-library-network-dev`
-
-### Volumes
-
-Persistent data storage:
-
-- `postgres_data`: PostgreSQL database files
-- `postgres_logs`: PostgreSQL logs
-- `app_logs`: Application logs
-
-In development mode, source code is also mounted:
-
-- `./src` → `/app/src` (for hot reload)
-
-### Health Checks
-
-Both containers have health checks:
-
-- **PostgreSQL**: `pg_isready` check every 10s
-- **Application**: HTTP check on port 4000
-
-### Auto-restart
-
-All containers configured with `restart: always` policy.
-
-## 📖 API Documentation
+## 📖 API Overview
 
 ### Authentication (Public)
 
@@ -326,257 +107,143 @@ All containers configured with `restart: always` policy.
 - `POST /auth/login` - Login and get tokens
 - `POST /auth/refresh` - Refresh access token
 
-### Protected Endpoints (Require JWT)
+### Protected Endpoints
 
-All endpoints below require `Authorization: Bearer <token>` header:
+All require `Authorization: Bearer <token>` header:
 
-**Users:**
+- **Users**: `/user` - CRUD operations
+- **Artists**: `/artist` - CRUD operations
+- **Albums**: `/album` - CRUD operations
+- **Tracks**: `/track` - CRUD operations
+- **Favorites**: `/favs` - Manage favorites
 
-- `GET /user` - Get all users
-- `GET /user/:id` - Get user by ID
-- `POST /user` - Create user
-- `PUT /user/:id` - Update password
-- `DELETE /user/:id` - Delete user
+See **[API Endpoints](doc/API_ENDPOINTS.md)** for complete reference.
 
-**Artists:**
+## 🧪 Testing
 
-- `GET /artist` - Get all artists
-- `GET /artist/:id` - Get artist by ID
-- `POST /artist` - Create artist
-- `PUT /artist/:id` - Update artist
-- `DELETE /artist/:id` - Delete artist
+```bash
+# All tests without authentication
+npm run test
 
-**Albums:**
+# Authentication tests
+npm run test:auth
 
-- `GET /album` - Get all albums
-- `GET /album/:id` - Get album by ID
-- `POST /album` - Create album
-- `PUT /album/:id` - Update album
-- `DELETE /album/:id` - Delete album
+# Refresh token tests
+npm run test:refresh
+```
 
-**Tracks:**
+See **[Testing Guide](doc/TESTING.md)** for details.
 
-- `GET /track` - Get all tracks
-- `GET /track/:id` - Get track by ID
-- `POST /track` - Create track
-- `PUT /track/:id` - Update track
-- `DELETE /track/:id` - Delete track
-
-**Favorites:**
-
-- `GET /favs` - Get all favorites
-- `POST /favs/artist/:id` - Add artist to favorites
-- `DELETE /favs/artist/:id` - Remove artist from favorites
-- `POST /favs/album/:id` - Add album to favorites
-- `DELETE /favs/album/:id` - Remove album from favorites
-- `POST /favs/track/:id` - Add track to favorites
-- `DELETE /favs/track/:id` - Remove track from favorites
-
-See [API_ENDPOINTS.md](./doc/API_ENDPOINTS.md) for detailed documentation.
-
-## 🏗️ Project Structure
+## 📊 Project Architecture
 
 ```
-src/
-├── prisma/                 # Prisma module
-│   ├── prisma.service.ts
-│   └── prisma.module.ts
-├── users/                  # User module
-├── artists/                # Artist module
-├── albums/                 # Album module
-├── tracks/                 # Track module
-├── favorites/              # Favorites module
-├── auth/                   # Authentication module
-└── main.ts                 # Entry point
-
-prisma/
-├── schema.prisma           # Database schema
-└── migrations/             # Migration files
-
-scripts/
-├── docker-entrypoint.sh    # Container startup script
-├── safe-build.sh           # Safe build with checks
-├── check-image-size.sh     # Check image sizes
-├── analyze-image.sh        # Analyze image contents
-├── scan-vulnerabilities.sh # Security scanning
-└── reset-database.sh       # Database reset
+nodejs2025Q2-service/
+├── src/
+│   ├── common/              # Shared modules
+│   │   ├── filters/         # Exception filters
+│   │   ├── interceptors/    # HTTP logging
+│   │   └── logging/         # Logging service
+│   ├── auth/                # Authentication
+│   ├── users/               # User management
+│   ├── artists/             # Artist management
+│   ├── albums/              # Album management
+│   ├── tracks/              # Track management
+│   ├── favorites/           # Favorites system
+│   ├── prisma/              # Prisma module
+│   └── main.ts              # Entry point
+├── prisma/
+│   ├── schema.prisma        # Database schema
+│   └── migrations/          # Migration files
+├── doc/                     # Documentation
+├── scripts/                 # Utility scripts
+└── test/                    # E2E tests
 ```
+
+See **[Project Structure](doc/PROJECT_STRUCTURE.md)** for detailed breakdown.
 
 ## 🔒 Security
 
-- ✅ Passwords hashed using bcrypt
-- ✅ JWT tokens for authentication
+- ✅ Password hashing with bcrypt
+- ✅ JWT token authentication
 - ✅ Environment variables for secrets
-- ✅ Docker security scanning available
-- ✅ Non-root user in containers
-- ✅ No dev dependencies in production
-- ✅ Minimal production image surface
+- ✅ Protected routes with guards
+- ✅ Input validation with class-validator
+- ✅ Non-root user in Docker containers
 
-## 🐛 Troubleshooting
+## 📝 Environment Variables
 
-### => ERROR [app 7/10] RUN npm install --prefer-offline --no-audit --progress=false &&
-
-![Image from Gyazo](https://i.gyazo.com/f02da4a130170b6a666aa259fe28d901.png)
-
-**Cause:** Prisma CLI cannot download its binaries (engines). This is a network problem - either a local firewall/antivirus is blocking the connection, or there is a problem with your ISP or DNS
-
-**Solution:**
-
-1. Installation via VPN If the problem is at the provider level or regional blocking, VPN is a direct solution.
-
-2. Use yarn instead of npm
-
-```bash
-npm install -g yarn
-yarn add prisma @prisma/client
-yarn prisma init
-```
-
-3. Change registry:
-
-```bash
-npm config set registry https://registry.npmmirror.com/
-rm -rf node_modules package-lock.json
-npm install prisma --save-dev
-```
-
-### Build fails with "EOF" or memory error
-
-**Cause:** Docker runs out of memory during npm install
-
-**Solution:**
-
-1. Increase Docker memory to 6-8GB in Docker Desktop Settings
-2. Close other applications
-3. Clean up: `npm run docker:prune`
-4. Try again: `npm run docker:build`
-
-### Image size > 500MB
-
-**Check which image:**
-
-```bash
-npm run docker:size
-```
-
-- **Development image (~700MB)**: This is normal! It includes all dev tools.
-- **Production image (should be ~400MB)**: If it's > 500MB, run:
-
-```bash
-npm run docker:analyze
-```
-
-This will show what's taking up space. Then rebuild:
-
-```bash
-npm run docker:prune
-npm run docker:build
-```
-
-### Database connection errors
-
-```bash
-# Reset database
-npm run docker:clean
-npm run docker:dev
-```
-
-### Port already in use
-
-Change ports in `.env`:
+Create `.env` (Docker) and `.env.local` (local development):
 
 ```env
-PORT=4001
-POSTGRES_PORT=5433
+# Application
+PORT=4000
+NODE_ENV=development
+
+# Database
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/home_library"
+
+# JWT
+JWT_SECRET_KEY=your_secret_key
+JWT_SECRET_REFRESH_KEY=your_refresh_secret
+TOKEN_EXPIRE_TIME=1h
+TOKEN_REFRESH_EXPIRE_TIME=24h
+
+# Logging
+LOG_LEVEL=3                    # 0-5 (default: 3)
+MAX_LOG_FILE_SIZE=5120         # KB (default: 5MB)
+CLEAR_LOGS_ON_STARTUP=true     # Clear logs on restart
 ```
 
-### Prisma Client not generated
+## 🐳 Docker
 
 ```bash
-npx prisma generate
-```
-
-### Migration errors
-
-```bash
-# Reset and reapply migrations
-npx prisma migrate reset
-npx prisma migrate dev
-```
-
-### "Cannot connect to database"
-
-**Check if PostgreSQL is ready:**
-
-```bash
-docker-compose logs postgres
-```
-
-Wait for: `database system is ready to accept connections`
-
-**Restart services:**
-
-```bash
-npm run docker:down
-npm run docker:prod
-```
-
-## 💡 Tips
-
-### Development Workflow
-
-```bash
-# 1. Start development environment
+# Development (hot reload)
 npm run docker:dev
 
-# 2. Make changes to src/ files
-# (Changes are automatically reloaded)
-
-# 3. When done
-npm run docker:down
-```
-
-### Production Deployment
-
-```bash
-# 1. Build optimized image
-npm run docker:build
-
-# 2. Check size (should be < 500MB)
-npm run docker:size
-
-# 3. Test locally
+# Production
 npm run docker:prod
 
-# 4. Push to registry
-npm run docker:push
+# Check sizes
+npm run docker:size
+
+# Clean up
+npm run docker:clean
 ```
 
-### Image Size Optimization
+See **[Docker Guide](doc/DOCKER.md)** for more commands.
 
-The production image is optimized through:
+## 🛠️ Available Scripts
 
-- Multi-stage build (builder → deps → production)
-- `npm ci --omit=dev` (clean production install)
-- Removal of unnecessary files (_.md, _.ts, \*.map)
-- No TypeScript, ESLint, or test tools
-- Minimal base image (node:24-alpine)
+### Application
 
-### Debugging
+- `npm run start:dev` - Development with hot reload
+- `npm run build` - Build for production
+- `npm run start:prod` - Run production build
 
-```bash
-# View logs
-docker-compose logs -f
+### Testing
 
-# Only app logs
-docker-compose logs -f app
+- `npm run test` - Run all tests
+- `npm run test:auth` - Authentication tests
+- `npm run test:refresh` - Refresh token tests
+- `npm run lint` - Lint code
+- `npm run format` - Format code
 
-# Execute command in container
-docker-compose exec app sh
+### Docker
 
-# Check what's inside the image
-npm run docker:analyze
-```
+- `npm run docker:dev` - Development mode
+- `npm run docker:prod` - Production mode
+- `npm run docker:down` - Stop containers
+- `npm run docker:clean` - Clean everything
+
+### Database
+
+- `npm run prisma:studio` - Open Prisma Studio
+- `npm run prisma:migrate:dev` - Create migration
+- `npm run prisma:generate` - Generate Prisma Client
+
+### Logs
+
+- `npm run logs:clear` - Clear all log files
 
 ## 🤝 Contributing
 
@@ -586,14 +253,17 @@ npm run docker:analyze
 4. Push to branch (`git push origin feat/amazing-feature`)
 5. Open Pull Request
 
-## 📝 License
+## 📄 License
 
 UNLICENSED
 
-## 🙏 Acknowledgments
+## 🎓 Credits
 
-- Built with [NestJS](https://nestjs.com/)
-- Database: [PostgreSQL](https://www.postgresql.org/)
-- ORM: [Prisma](https://www.prisma.io/)
-- Containerization: [Docker](https://www.docker.com/)
-- Alma-Mater: [RS School](https://rs.school/courses/nodejs)
+- **Course**: [RS School Node.js Course](https://rs.school/courses/nodejs)
+- **Framework**: [NestJS](https://nestjs.com/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/) + [Prisma](https://www.prisma.io/)
+- **Containerization**: [Docker](https://www.docker.com/)
+
+---
+
+**Made with ❤️ within the [RS](https://rs.school/) School**

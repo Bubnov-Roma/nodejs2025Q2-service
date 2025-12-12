@@ -68,7 +68,7 @@ async function bootstrap() {
   const port = process.env.PORT || 4000;
   await app.listen(port);
   logger.log(
-    `🚀 Application is running on: http://localhost:${port}`,
+    `🚀 Application is running on: \x1b[32mhttp://localhost:${port}\x1b[0m`,
     'Bootstrap',
   );
 
@@ -78,13 +78,13 @@ async function bootstrap() {
     'Bootstrap',
   );
   logger.log(
-    '⚠️ To check tests without authorization, please comment the \x1b[33mTODO:\x1b[32m lines in the files:',
-    `
-    ./albums/albums.controller.ts 
+    `⚠️ To check tests without authorization, please comment \x1b[33mTODO:\x1b[0m lines in the next files:
+    \x1b[34m./albums/albums.controller.ts 
     ./artists/artists.controller.ts
     ./favorites/favorites.controller.ts
     ./tracks/tracks.controller.ts
     ./users/users.controller.ts\x1b[0m`,
+    'Bootstrap',
   );
 }
 bootstrap();
