@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: home-library-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_logs:/var/log/postgresql
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    networks:
+      - home-library-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: ${DOCKER_USERNAME}/home-library-app:latest
+    container_name: home-library-app
+    restart: always
+    ports:
+      - '${PORT}:4000'
+    environment:
+      PORT: ${PORT}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      CRYPT_SALT: ${CRYPT_SALT}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_SECRET_REFRESH_KEY: ${JWT_SECRET_REFRESH_KEY}
+      TOKEN_EXPIRE_TIME: ${TOKEN_EXPIRE_TIME}
+      TOKEN_REFRESH_EXPIRE_TIME: ${TOKEN_REFRESH_EXPIRE_TIME}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - home-library-network
+    volumes:
+      - app_logs:/app/logs
+
+networks:
+  home-library-network:
+    driver: bridge
+    name: home-library-network
+
+volumes:
+  postgres_data:
+    driver: local
+    name: home-library-postgres-data
+  postgres_logs:
+    driver: local
+    name: home-library-postgres-logs
+  app_logs:
+    driver: local
+    name: home-library-app-logs
